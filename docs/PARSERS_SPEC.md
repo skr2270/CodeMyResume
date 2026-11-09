@@ -86,3 +86,4 @@ Using local `git` commands (or `pygit2` / `GitPython`), CMR extracts:
 * **Active Tenure:** Date of first commit and date of most recent commit (e.g., `May 2024 – Present`).
 * **Velocity Metrics:** Total commit count, number of releases/tags.
 * **Top Contributors:** Validates that the active user is the primary author or a key contributor to the repository.
+

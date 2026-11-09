@@ -128,3 +128,4 @@ To achieve high scanning performance across multi-gigabyte project directories:
 * Shields.io badge badges for languages and social coordinates.
 * Categorized skill matrix table with clear domain boundaries.
 * Project showcase with architectural bullet points and deep links.
+

@@ -26,3 +26,4 @@ dependencies = [
 [project.scripts]
 cmr = "cmr.cli:app"
 code-my-resume = "cmr.cli:app"
+

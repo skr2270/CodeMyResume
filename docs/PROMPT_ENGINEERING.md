@@ -69,3 +69,4 @@ Key Docs Info:
 Before emitting the resume points, CMR runs a validation filter:
 1. **Keyword Overlap Check:** Verifies that all capitalized technical terms in the generated bullets exist in the project's dependency manifest or documentation token list.
 2. **Flagged Metric Check:** Any percentage over 80% or metric that does not match a regex pattern in the source docs triggers a review flag.
+

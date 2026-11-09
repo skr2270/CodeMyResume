@@ -49,3 +49,4 @@ flowchart LR
 - [ ] Auto-updates your profile `README.md` and rebuilds your resume PDF upon tagging a new release across your repositories.
 - [ ] Docker container image for automated cloud runners.
 - [ ] Distribution via PyPI (`pip install code-my-resume`) and npm (`npx code-my-resume`).
+
