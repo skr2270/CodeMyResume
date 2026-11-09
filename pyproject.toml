@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "code-my-resume"
+version = "0.1.0"
+description = "Don't write your resume. Let your code write it for you. Automatically scan local codebases and docs to generate an ATS resume and GitHub profile."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Sai Kumar Rayavarapu", email = "sk.r.2270@gmail.com" }
+]
+keywords = ["resume", "cv", "portfolio", "github", "developer-tools", "ats-resume", "reportlab"]
+dependencies = [
+    "typer>=0.12.0",
+    "rich>=13.7.0",
+    "pyyaml>=6.0.1",
+    "pydantic>=2.7.0",
+    "reportlab>=4.0.0",
+    "google-generativeai>=0.5.0",
+    "python-dotenv>=1.0.1"
+]
+
+[project.scripts]
+cmr = "cmr.cli:app"
+code-my-resume = "cmr.cli:app"
