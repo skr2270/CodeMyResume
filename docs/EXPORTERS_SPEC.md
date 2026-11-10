@@ -21,7 +21,7 @@ All exporters in `src/cmr/exporters/` **must be pure, stateless renderers**. The
   * `## PROFESSIONAL EXPERIENCE`
   * `## EDUCATION`
 * **Single-Column Discipline:** Never wraps experience descriptions inside multi-column Markdown tables so automated ATS tokenizers preserve chronological reading order.
-* **Competency Matrix Format:** Emits bold category rows (`- **Category:** Skill1, Skill2, ...`) derived directly from `ResumeAST.competency_matrix`.
+* **Competency Matrix Format:** Emits bold category rows (`- **Category:** Skill1, Skill2, ...`) iterating strictly in order over `ResumeAST.competency_matrix` (`List[CompetencyCategory]`).
 
 ---
 
@@ -40,8 +40,8 @@ All exporters in `src/cmr/exporters/` **must be pure, stateless renderers**. The
    * Set `keepWithNext=True` on section headings and italicized role taglines.
    * Wrap `[job_header, job_tag, first_bullet(s)]` inside `reportlab.platypus.KeepTogether(...)` so a role title never sits stranded at the bottom of Page 1.
 3. **Dynamic Job-Header Column Sizing:** Calculate right-column width per `ExperienceBlock` using `pdfmetrics.stringWidth(right_text, font_name, font_size) + 8.0` so long date/location headers (e.g., `"June 2019 – September 2020 | Hyderabad & Bangalore"`) never wrap their final city word onto a second orphan line.
-4. **Unicode TTF & Glyph Safety:**
-   * Bundle an OFL/Apache TrueType font family (e.g., `Inter` or `DejaVuSans`) in `src/cmr/assets/fonts/` (shipped via `[tool.setuptools.package-data]`) with OS font lookup fallback and WinAnsi sanitization for Type1 fallback mode—preventing black box (`■`) glyph failures on `₹`, em-dashes, or symbols.
+4. **Unicode TTF & Font-Family Registration:**
+   * Bundle all four OFL/Apache TrueType weights (`Regular`, `Bold`, `Italic`, `BoldItalic` for `Inter` / `DejaVuSans`) in `src/cmr/assets/fonts/` (shipped via `[tool.setuptools.package-data]`) and bind them via `pdfmetrics.registerFontFamily(...)` so inline `<b>`/`<i>` markup inside ReportLab `Paragraph` blocks renders accurately without silently dropping to Helvetica. Provide WinAnsi sanitization if Type1 fallback mode is explicitly requested—preventing black box (`■`) glyph failures on `₹`, em-dashes, or symbols.
 5. **Active Clickable Annotations:** Email (`mailto:`), LinkedIn, and GitHub header links render as ReportLab `<a href="...">` annotations verified via `pdfplumber`.
 6. **Footer Callback Isolation:** `onFirstPage` and `onLaterPages` render subtle footer text at `y <= 18 pt` (ReportLab bottom-up origin), cleanly separated below `bottomMargin = 34 pt`.
 
@@ -58,7 +58,7 @@ Because `ReportLab` uses bottom-up coordinates (`y = 0` at bottom) while `pdfplu
      * `body_font` in `[7.6pt, 8.8pt]` (`0.15pt` steps), `leading = body_font * 1.38`, and vertical spacer scale `[3pt, 8pt]`.
      * Scale **down** if `len(pages) > target_pages` or if the final page overflows thinly (`< min_last_page_fill_ratio`).
      * Scale **up** if `len(pages) == target_pages` and `fill_ratio(1) < min_page1_fill_ratio` (`0.88`).
-   * **Budget Failure Exit:** If constraints (`len(pages) == target_pages`, `fill_ratio(1) >= 0.88`, `fill_ratio(last) >= 0.65`) cannot be met inside font bounds, exit with **Exit Code `3`**.
+   * **Optional Compaction & Exit Code `3`:** If `body_font == 7.6pt` still overflows by a few lines, trim trailing secondary `sub_bullets` gracefully (never altering verified prose or core lead bullets). If constraints (`len(pages) == target_pages`, `fill_ratio(1) >= 0.88`, `fill_ratio(last) >= 0.65`) still cannot be satisfied, exit with **Exit Code `3`**.
 
 ---
 

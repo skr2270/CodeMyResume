@@ -9,7 +9,7 @@
 1. **Local-First & Zero Telemetry:** CMR does not phone home, collect telemetry, or upload repositories to third-party servers.
 2. **Offline-First `cmr scan`:** Default scanning (`cmr scan`) executes 100% locally with zero outbound network requests unless `--summarize` is explicitly enabled.
 3. **Strict Zero-Read File Blocklist:** Credential files, private keys, and runtime environment files are never opened or parsed:
-   * `.env`, `.env.*` *(only `.env.example` / `.env.template` key names are inspected for cloud service hints)*
+   * `.env`, `.env.*` *(only `.env.example` / `.env.template` are parsed—strictly extracting `line.split("=", 1)[0]` key names and discarding values after `=` so accidental default passwords never ingest)*
    * `*.pem`, `*.key`, `*.p12`, `*.keystore`, `*.jks`
    * `google-services.json`, `GoogleService-Info.plist`, `*service-account*.json`
    * `id_rsa*`, `id_ed25519*`, `.npmrc`, `.pypirc`

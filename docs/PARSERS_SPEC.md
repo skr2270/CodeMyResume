@@ -149,10 +149,10 @@ Inspects deployment artifacts (never reading `.env` secrets) without assuming un
 ## 5. Multi-Repo Git Telemetry & Fork Exclusion (`git_parser.py`)
 
 Because multi-repo suites (`GJI/`, `RME/`, `GestureGame/`) hold `.git` inside child directories rather than at the suite root:
-1. **Child `.git` Aggregation:** Discovers all `.git` directories inside `ProjectProfile.root_path` and aggregates commit counts, author shares, earliest `first_commit_date`, and latest `last_commit_date` across every sub-repo.
+1. **Child `.git` Enumeration & Parallel Collection:** Discovers all `.git` directories inside `ProjectProfile.root_path` and collects per-repo telemetry cleanly using bounded `ThreadPoolExecutor` workers (sorting output paths deterministically).
 2. **Author Attribution:** Matches `git shortlog -s -e --all` case-insensitively against `CareerContext.git_author_emails` (including GitHub `*@users.noreply.github.com` aliases) and git config `user.email`.
-3. **Edge-Case Resilience:** Gracefully skips newly initialized 0-commit repos, handles detached HEAD states, and tolerates missing `git` binaries on minimal systems.
-4. **Fork / Low Authorship Filter:** Repos with `< 5%` user commits set `is_fork_or_low_authorship = True`; their exclusive languages never enter core competencies unless explicitly whitelisted.
+3. **Per-Repo Fork Filtering BEFORE Aggregation *(Critical)*:** Evaluates `user_commit_share_pct < min_user_commit_share_pct` (`5.0%`) **independently on each child `.git` repo before merging** into the parent `ProjectProfile`. Sub-repos failing this threshold are marked forked/excluded so a large embedded upstream fork (e.g., `12,000` upstream commits) cannot drag an authored sibling repo's aggregate commit share below `5%`.
+4. **Edge-Case & Language Weight Rules:** Gracefully skips newly initialized 0-commit repos, detached HEADs, and missing `git` binaries. Language weights (`ProjectProfile.languages: Dict[str, float]`) sum to `100.0%` by counting non-minified source lines per extension (excluding `*.min.js`, lockfiles, `node_modules`, build artifacts) across non-forked repos.
 
 ---
 

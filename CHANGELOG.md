@@ -16,7 +16,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
   - Upgraded `pyproject.toml` and `requirements.txt` to unified `google-genai`, `pdfplumber`, `httpx`, Python 3.10 `tomli`, `setuptools` `src`-layout discovery, and `[dev]` extras.
 
 ### Changed
-- **Real-Workspace Compatibility & Layering Alignment:**
+- **SDK Compatibility, Config Typing & Pre-Aggregation Hardening:**
+  - Replaced unbounded `Dict` fields in `ResumeAST` (`docs/ARCHITECTURE.md`) with typed `ContactInfo` and `List[CompetencyCategory]` for strict `google-genai` `response_schema` compatibility; added `CMRConfig`, optional `CareerContext.phone`, `CareerContext.max_flagship_projects`, and `EducationEntry.honors_or_gpa`.
+  - Updated `git_parser.py` specification (`docs/PARSERS_SPEC.md`) to evaluate the `< 5%` fork threshold per child `.git` root *before* suite aggregation and documented deterministic language LOC percentage weights.
+  - Hardened `.env.example` key-only parsing (`docs/SECURITY.md`), ReportLab `registerFontFamily()` + fallback sub-bullet trimming (`docs/EXPORTERS_SPEC.md`), `--dry-run` token estimation + word budgets + `prompt_version` cache keys (`docs/PRD.md`, `docs/PROMPT_ENGINEERING.md`), and Fixture F testing (`docs/TESTING_AND_QA.md`).
+- **Education Date Best-Practice Alignment (`0fb1a64`):**
+  - Updated `career_context.example.yaml`, `docs/PRD.md`, `docs/EXPORTERS_SPEC.md`, and `docs/PROMPT_ENGINEERING.md` to omit education `start_date` ("from" dates) by default (`Expected: ...` / `Graduated: ...` only).
+- **Real-Workspace Compatibility & Layering Alignment (`235b230`):**
   - Decoupled offline deterministic parsing (`cmr.parsers`, `cmr scan`) from optional LLM Map-Reduce summarization (`cmr.engine.summarizer`), and aligned `v0.1.0` vs. `v0.2.0` milestones across `README.md` and `docs/ROADMAP.md`.
   - Extended `detector.py`, `manifest_parser.py`, `topology_detector.py`, `git_parser.py`, and `TAXONOMY_RULES` for npm/pnpm `workspaces`, `devDependencies`, modern Nx layouts (excluding `*-e2e`), unprefixed `backend/`/`mobile/` pairs, umbrella multi-platform suites, nested `.git` child aggregation, and Gradle/container runtimes.
   - Added `LinkedInSection`, bullet-level `source_projects` provenance, `denied_claims`, `ai_workflow_note`, and `schema_version` to Pydantic contracts; scrubbed synthetic placeholder examples in `docs/PRD.md` and `docs/PROMPT_ENGINEERING.md`.

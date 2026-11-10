@@ -25,7 +25,7 @@
 
 ## 3. CLI Command Contract (`cmr`)
 
-All commands store intermediate state inside `.cmr/` in the working directory by default so users don't have to pass repeated file paths.
+All commands store intermediate state inside `.cmr/` in the working directory by default so users don't have to pass repeated file paths. Configuration precedence follows `CLI flags > workspace config.yaml > packaged CMRConfig defaults`, and career context resolves `.cmr/career_context.yaml` first with fallback to `./career_context.yaml`.
 
 ### 3.1 `cmr scan <PATH>` *(Phase 1 — `v0.1.0`)*
 Recursively scans a local projects directory deterministically offline and generates `.cmr/scan_report.json`.
@@ -34,9 +34,10 @@ Recursively scans a local projects directory deterministically offline and gener
 | :--- | :--- | :--- |
 | `PATH` *(arg)* | Required | Root directory containing one or more repositories (e.g., `~/Projects`). |
 | `--output`, `-o` | `.cmr/scan_report.json` | Destination path for discovered `ProjectProfile` JSON payload. |
-| `--config`, `-c` | `config.yaml` | Optional YAML override for ignore dirs, budgets, and git settings. |
+| `--config`, `-c` | `config.yaml` | Optional YAML override validated via `CMRConfig`. |
 | `--no-cache` | `False` | Bypass `.cmr/cache/` SHA-256 cache and re-digest all files. |
 | `--summarize` | `False` | *(Phase 2)* Run LLM Map-Reduce doc summarization via `engine/summarizer.py` after deterministic extraction (never enabled without explicit opt-in). |
+| `--dry-run` | `False` | With `--summarize`, print estimated token counts and cost without invoking cloud LLM APIs. |
 
 ### 3.2 `cmr init-context` *(Phase 2 — `v0.2.0`)*
 Bootstraps a pre-populated `.cmr/career_context.yaml` from scan results and emits `.cmr/career_context.schema.json` for editor validation.
@@ -61,6 +62,7 @@ Merges `scan_report.json` + `career_context.yaml`, synthesizes & validates `Resu
 | `--pages` | `2` | Target PDF page budget (`1` or `2`). |
 | `--page-size` | `A4` | Paper geometry (`A4` or `LETTER`), overriding `config.yaml`. |
 | `--validate-only` | `False` | Re-run `validator.py` + exporters against an existing `.cmr/resume_ast.json` without invoking an LLM. |
+| `--dry-run` | `False` | Print sanitized context token/cost estimate without calling cloud LLM APIs. |
 | `--strict` | `True` | Fail non-zero if `validator.py` flags any topology, secret, or LinkedIn char-limit violation. |
 
 ### 3.4 `cmr diff` *(Phase 2 — `v0.2.0`)*

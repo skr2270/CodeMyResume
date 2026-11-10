@@ -25,10 +25,11 @@ Shared offline `tmp_path` builders and mocked `LLMClient` fixtures live in `test
 * **Fixture C (`fork_leak`):** Forked Go repo with `< 5%` user commits $\rightarrow$ `is_fork_or_low_authorship == True`; `Go` never enters `ResumeAST.competency_matrix`.
 * **Fixture D (`multi_git_polyglot_suite`):** Suite root with no `.git`, nested `.git` children (`foo-backend`, `foo-react-native`, `foo-web`) + unprefixed (`backend/`, `mobile/`) variant $\rightarrow$ unified `polyglot_fullstack_workspace`, git stats aggregated across all child `.git` roots.
 * **Fixture E (`single_app_npm_workspace`):** Root `package.json` (`deps: []`, `workspaces: ["apps/*"]`) + `apps/web/package.json` (`three`, `vite`, `@mediapipe/tasks-vision`) + ignored `.next/package.json` $\rightarrow$ extracts all `apps/web` deps cleanly while ignoring `.next/`.
+* **Fixture F (`mixed_authorship_suite`):** Suite containing `backend/.git` (`100%` user commits across `300` commits) and embedded third-party fork `vendor-fork/.git` (`0.5%` user commits across `12,000` commits) $\rightarrow$ per-repo evaluation excludes `vendor-fork` before aggregation so `backend/` stays verified (`is_fork_or_low_authorship == False`). Also verifies `CMRConfig`, `ContactInfo`, and `List[CompetencyCategory]` JSON schema compatibility.
 
 ### 2.2 Secret & IP Redaction Gate (`sanitizer.py`)
-* Given inputs containing `ssh root@103.160.106.186`, `AIzaSyDummyApiKey123`, `postgres://admin:secret@db.internal:5432/prod`, alongside `0.0.0.0`, `127.0.0.1`, `192.168.1.10`, version `16.0.10`, Windows build `10.0.22621.1`, and an `.env` sibling file:
-  * `.env` is never opened (verified via spy/mock).
+* Given inputs containing `ssh root@103.160.106.186`, `AIzaSyDummyApiKey123`, `postgres://admin:secret@db.internal:5432/prod`, alongside `0.0.0.0`, `127.0.0.1`, `192.168.1.10`, version `16.0.10`, Windows build `10.0.22621.1`, an `.env` sibling file, and `.env.example` containing `DB_PASS=devsecret123`:
+  * `.env` is never opened (verified via spy/mock), and `.env.example` extracts only the `DB_PASS` key name without ingesting `devsecret123`.
   * Public IP/key/URI strings become `[REDACTED_*]`, while RFC 1918, `0.0.0.0`, `127.0.0.1`, and version strings remain intact.
 
 ### 2.3 PDF Layout & Density Gate (`pdfplumber` Assertions)

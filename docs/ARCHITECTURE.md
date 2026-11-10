@@ -60,7 +60,7 @@ CodeMyResume/
 │   └── cmr/
 │       ├── __init__.py
 │       ├── cli.py                     # Typer CLI entrypoint (scan, init-context, generate, diff)
-│       ├── models.py                  # Pydantic v2 schemas: ProjectProfile, CareerContext, ResumeAST
+│       ├── models.py                  # Pydantic v2 schemas: CMRConfig, ProjectProfile, CareerContext, ResumeAST
 │       ├── assets/
 │       │   └── fonts/                 # Bundled OFL/Apache TTF font family (Inter / DejaVuSans)
 │       ├── scanner/
@@ -100,6 +100,51 @@ CodeMyResume/
 ---
 
 ## 3. Core Pydantic v2 Data Schemas (`src/cmr/models.py`)
+
+### 3.0 `CMRConfig` (`config.yaml` — Runtime Configuration & Defaults)
+
+Validated configuration schema supporting precedence (`CLI flags > workspace config.yaml > packaged defaults`):
+
+```python
+class ScannerConfig(BaseModel):
+    ignore_dirs: List[str] = Field(default_factory=list)
+    exclude_doc_files: List[str] = Field(default_factory=list)
+    max_file_size_bytes: int = 262144
+
+class DocBudgetConfig(BaseModel):
+    full_file_max_chars: int = 8000
+    map_chunk_chars: int = 10000
+    chunk_token_estimate_chars: float = 3.5
+    tier1_digest_budget: int = 16000
+    tier2_digest_budget: int = 3000
+    tier2_keywords: List[str] = Field(default_factory=list)
+
+class GitConfig(BaseModel):
+    min_user_commit_share_pct: float = 5.0
+
+class LLMConfig(BaseModel):
+    provider: Literal["gemini", "ollama", "openai", "anthropic"] = "gemini"
+    synthesis_model: str = "gemini-2.5-flash"
+    map_model: str = "gemini-2.5-flash-lite"
+    temperature: float = 0.1
+    ollama_base_url: str = "http://localhost:11434"
+    max_retries: int = 2
+
+class PDFConfig(BaseModel):
+    page_size: Literal["A4", "LETTER"] = "A4"
+    target_pages: int = 2
+    min_page1_fill_ratio: float = 0.88
+    min_last_page_fill_ratio: float = 0.65
+    font_family: str = "Inter"
+
+class CMRConfig(BaseModel):
+    scanner: ScannerConfig = Field(default_factory=ScannerConfig)
+    doc_budget: DocBudgetConfig = Field(default_factory=DocBudgetConfig)
+    git: GitConfig = Field(default_factory=GitConfig)
+    llm: LLMConfig = Field(default_factory=LLMConfig)
+    pdf: PDFConfig = Field(default_factory=PDFConfig)
+    taxonomy_overrides: Dict[str, List[str]] = Field(default_factory=dict)
+```
 
 ### 3.1 `ProjectProfile` (Raw Extracted Repository Truth)
 
@@ -183,12 +228,13 @@ class EducationEntry(BaseModel):
     start_date: Optional[str] = None
     end_date_or_expected: str
     specialization: Optional[str] = None
+    honors_or_gpa: Optional[str] = None
 
 class CareerContext(BaseModel):
     full_name: str
     headline: str
     location: str
-    phone: str
+    phone: Optional[str] = None
     email: str
     linkedin_url: Optional[str] = None
     github_username: Optional[str] = None
@@ -196,6 +242,7 @@ class CareerContext(BaseModel):
     excluded_directories: List[str] = Field(default_factory=list)
     denied_claims: List[str] = Field(default_factory=list)
     ai_workflow_note: Optional[str] = None
+    max_flagship_projects: int = 6
     employment_anchors: List[EmploymentAnchor] = Field(default_factory=list)
     education: List[EducationEntry] = Field(default_factory=list)
 ```
@@ -244,16 +291,27 @@ class LinkedInSection(BaseModel):
     skills: List[str] = Field(default_factory=list) # Strictly <= 50 items
     cleanup_notes: List[str] = Field(default_factory=list)
 
+class ContactInfo(BaseModel):
+    email: str
+    phone: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    github_url: Optional[str] = None
+    location: str
+
+class CompetencyCategory(BaseModel):
+    category: str                                   # e.g., "Backend & Distributed"
+    skills: List[str] = Field(default_factory=list)
+
 class ResumeAST(BaseModel):
     schema_version: str = "1.0"
     generated_at: str
     target_persona: Optional[str] = None
     full_name: str
     headline: str
-    contact_line: Dict[str, str]
+    contact_line: ContactInfo
     professional_summary: str
     ai_workflow_note: Optional[str] = None
-    competency_matrix: Dict[str, List[str]]
+    competency_matrix: List[CompetencyCategory]     # Typed ordered list (Gemini response_schema safe)
     experiences: List[ExperienceBlock]
     flagship_projects: List[FlagshipProjectCard]
     education: List[EducationEntry]

@@ -43,21 +43,25 @@ MANDATORY RULES:
    (`is_fork_or_low_authorship == false`) or `CareerContext.non_code_impacts`.
    Never emit items listed in `CareerContext.denied_claims`.
 6. CHRONOLOGICAL ISOLATION: Bind projects strictly to their assigned `EmploymentAnchor`.
-7. LINKEDIN SECTION SYNTHESIS: Populate `ResumeAST.linkedin` cleanly within hard limits:
+7. WORD BUDGET CALIBRATION: Keep resume copy proportional to `--pages` budget
+   (~650-850 words total for 2 pages; ~350-450 words total for 1 page) so ReportLab
+   calibration hits density bounds cleanly without overflow.
+8. LINKEDIN SECTION SYNTHESIS: Populate `ResumeAST.linkedin` cleanly within hard limits:
    headline <= 220 chars, about <= 2600 chars, each experience description <= 2000 chars,
    and <= 50 verified skills.
-8. ZERO LEAKED SECRETS: Never emit IPv4 literals, tokens, connection URIs, or `[REDACTED_*]` tags.
+9. ZERO LEAKED SECRETS: Never emit IPv4 literals, tokens, connection URIs, or `[REDACTED_*]` tags.
 ```
 
 ---
 
-## 3. Unified LLM Client & Repair Loop (`llm_client.py`)
+## 3. Unified LLM Client, Cache Keys & Repair Loop (`llm_client.py`)
 
-`llm_client.py` provides a clean provider abstraction with Pydantic validation guarantees:
+`llm_client.py` provides a clean provider abstraction with Pydantic validation and cost safeguards:
 
-* **Gemini (`google-genai`, Default Cloud):** Uses `from google import genai` with `response_schema=ResumeAST` and `temperature=0.1`. Exponential backoff handles HTTP 429 rate limits cleanly.
+* **Gemini (`google-genai`, Default Cloud):** Uses `from google import genai` with `response_schema=ResumeAST` and `temperature=0.1`. Typed `ContactInfo` and `List[CompetencyCategory]` avoid open `Dict` / `additionalProperties` schemas rejected by Gemini OpenAPI validation. Exponential backoff handles HTTP 429 rate limits cleanly.
 * **Ollama (100% Air-Gapped Local Inference):** Connects to `OLLAMA_BASE_URL` over `httpx` with strict JSON formatting prompts.
 * **OpenAI / Anthropic (Optional `[llms]` Extras):** Selected via `CMR_LLM_PROVIDER`.
+* **Dry-Run Token & Cost Estimator (`--dry-run`) & Versioned Cache Keys:** Before calling paid cloud endpoints, `--dry-run` reports estimated prompt token counts and spend via `rich`. Optional Map-Reduce digests in `.cmr/cache/` key on `(file_path, sha256(sanitized_content), model_id, prompt_version, map_chunk_chars)` so prompt updates invalidate stale cache entries automatically.
 * **Markdown Fence Strip & Validation-Repair Loop:** Open-weight/Ollama models frequently wrap JSON in ```` ```json ```` fences or miss nested schema keys. `llm_client.py` strips code fences, parses with `ResumeAST.model_validate_json()`, and runs up to **`config.llm.max_retries` (`2`)** automatic error-feedback repair turns if Pydantic validation fails.
 
 ---
