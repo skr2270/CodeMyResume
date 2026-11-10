@@ -13,6 +13,11 @@ build/
 dist/
 *.egg-info/
 
+# Tool caches & workspace state
+.pytest_cache/
+.ruff_cache/
+.cmr/
+
 # Output artifacts
 output/
 *.pdf
@@ -22,3 +27,5 @@ output/
 .env
 *.local
 
+# Stray IDE/tool files
+--db

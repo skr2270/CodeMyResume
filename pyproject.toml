@@ -1,29 +1,51 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=68.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "code-my-resume"
 version = "0.1.0"
-description = "Don't write your resume. Let your code write it for you. Automatically scan local codebases and docs to generate an ATS resume and GitHub profile."
+description = "Don't write your resume. Let your code write it for you. Automatically scan local codebases and docs to generate an ATS resume, GitHub profile, and LinkedIn pack."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
     { name = "Sai Kumar Rayavarapu", email = "sk.r.2270@gmail.com" }
 ]
-keywords = ["resume", "cv", "portfolio", "github", "developer-tools", "ats-resume", "reportlab"]
+keywords = ["resume", "cv", "portfolio", "github", "linkedin", "developer-tools", "ats-resume", "reportlab"]
 dependencies = [
     "typer>=0.12.0",
     "rich>=13.7.0",
     "pyyaml>=6.0.1",
     "pydantic>=2.7.0",
     "reportlab>=4.0.0",
-    "google-generativeai>=0.5.0",
-    "python-dotenv>=1.0.1"
+    "pdfplumber>=0.11.0",
+    "google-genai>=1.0.0",
+    "httpx>=0.27.0",
+    "python-dotenv>=1.0.1",
+    "tomli>=2.0.0; python_version < '3.11'",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "ruff>=0.4.0",
 ]
 
 [project.scripts]
 cmr = "cmr.cli:app"
 code-my-resume = "cmr.cli:app"
 
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
