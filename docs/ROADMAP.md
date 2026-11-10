@@ -18,7 +18,7 @@ flowchart LR
 ## Phase 1: Core Scanner, Parsers & Models (v0.1.0) — *In Progress*
 - [x] Initial repository scaffolding, MIT License, and `.gitignore` hygiene.
 - [x] Clean packaging configuration in `pyproject.toml` & `requirements.txt` (`src`-layout `packages.find`, `google-genai`, `pdfplumber`, `httpx`, Python 3.10 `tomli` marker, and `dev` extras).
-- [x] Complete specifications in `docs/` (`ARCHITECTURE.md`, `PARSERS_SPEC.md`, `PROMPT_ENGINEERING.md`).
+- [x] Complete specifications & root docs (`PRD.md`, `ARCHITECTURE.md`, `PARSERS_SPEC.md`, `PROMPT_ENGINEERING.md`, `SECURITY.md`, `TESTING_AND_QA.md`, `CONTRIBUTING.md`, `CHANGELOG.md`).
 - [ ] Complete `src/cmr/` module layout (`engine/`, `exporters/`, `tests/`, `config.yaml`, `career_context.example.yaml`) and Pydantic v2 schemas in `src/cmr/models.py` (`ProjectProfile`, `CareerContext` + `project_groups`, `ResumeAST`).
 - [ ] `src/cmr/scanner/walker.py` & `detector.py`: Pruned `os.walk` traversal + polyglot workspace grouping.
 - [ ] `src/cmr/parsers/manifest_parser.py`: Extractors for `package.json`, `pyproject.toml`, `requirements.txt`, `go.mod`, `Cargo.toml`.

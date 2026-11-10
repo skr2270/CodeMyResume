@@ -29,14 +29,20 @@ CMR uses a standard Python `src`-layout matching the `cmr.cli:app` entrypoint de
 ```text
 CodeMyResume/
 ├── README.md                          # Project overview, pipeline diagram, and quick start
+├── CHANGELOG.md                       # Chronological release and specification history
+├── CONTRIBUTING.md                    # Developer setup, offline testing, and PR conventions
+├── LICENSE                            # MIT License
 ├── pyproject.toml                     # Package metadata, setuptools src-layout, and CLI scripts
 ├── requirements.txt                   # Pinned runtime dependencies
 ├── config.yaml                        # (Planned) Default ignore lists, token budgets, and LLM settings
 ├── career_context.example.yaml        # (Planned) Template for anchors, exclusions, and non-code impact
 ├── docs/                              # Architectural & parser specifications
+│   ├── PRD.md                         # Product requirements, CLI contract, exit codes, and YAML examples
 │   ├── ARCHITECTURE.md                # System design, directory layout, and Pydantic schemas
 │   ├── PARSERS_SPEC.md                # Manifest, topology, infra, doc chunking, sanitizer, git specs
 │   ├── PROMPT_ENGINEERING.md          # XYZ-formula prompts, anti-recency rules, and validation checks
+│   ├── SECURITY.md                    # Threat model, zero-read secrets, and sanitizer redaction policy
+│   ├── TESTING_AND_QA.md              # Offline test pyramid, pdfplumber bounds, and LinkedIn char gates
 │   └── ROADMAP.md                     # Phased engineering milestones
 ├── src/
 │   └── cmr/

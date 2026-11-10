@@ -136,16 +136,21 @@ All technical specifications, schemas, and engineering guidelines live in [`docs
 
 | Document | Description |
 | :--- | :--- |
+| **[`docs/PRD.md`](./docs/PRD.md)** | Product requirements, user personas, full CLI contract (`scan`, `init-context`, `generate`, `diff`), exit codes, and `config.yaml` / `career_context.yaml` schemas |
 | **[`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)** | `src/cmr/` package layout, Pydantic schemas (`ProjectProfile`, `CareerContext`, `ResumeAST`), and stateless exporters |
-| **[`docs/PARSERS_SPEC.md`](./docs/PARSERS_SPEC.md)** | Manifest rules (`tomli`/`tomllib`), topology classifier, infra detector, anti-recency doc chunking, and git authorship filters |
+| **[`docs/PARSERS_SPEC.md`](./docs/PARSERS_SPEC.md)** | Manifest rules (`tomli`/`tomllib`), topology classifier, infra detector, full-file Map-Reduce chunking, `sanitizer.py`, and git authorship filters |
 | **[`docs/PROMPT_ENGINEERING.md`](./docs/PROMPT_ENGINEERING.md)** | Google XYZ-formula prompts, chronology/terminology guardrails, and post-generation ground-truth validation |
+| **[`docs/SECURITY.md`](./docs/SECURITY.md)** | Threat boundary, zero-read secret file blocklist, `sanitizer.py` redaction rules, and offline Ollama privacy guarantee |
+| **[`docs/TESTING_AND_QA.md`](./docs/TESTING_AND_QA.md)** | Offline unit test pyramid, topology/leak gates, `pdfplumber` fill-bounds/hyperlink assertions, and LinkedIn char-cap gates |
 | **[`docs/ROADMAP.md`](./docs/ROADMAP.md)** | Honest milestone tracker across Phase 1 (CLI/Parsers) through Phase 4 (GitHub Action) |
+| **[`CONTRIBUTING.md`](./CONTRIBUTING.md)** | Local setup, offline test rules, adding `TAXONOMY_RULES` / exporters, and Conventional Commits |
+| **[`CHANGELOG.md`](./CHANGELOG.md)** | Versioned release and specification history (Keep a Changelog) |
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Whether it's implementing a manifest/topology parser, refining ReportLab dynamic pagination, or adding prompt validation rules:
+Contributions are welcome! See **[`CONTRIBUTING.md`](./CONTRIBUTING.md)** for full setup, testing, and PR guidelines:
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/topology-detector`)
