@@ -13,19 +13,23 @@ build/
 dist/
 *.egg-info/
 
-# Tool caches & workspace state
+# Tool caches, coverage & workspace state
 .pytest_cache/
 .ruff_cache/
+.coverage
+htmlcov/
 .cmr/
 
-# Output artifacts
+# Personal career context & output artifacts (use career_context.example.yaml for templates)
+career_context.yaml
 output/
 *.pdf
 *.html
 
-# Secrets
+# Secrets & logs
 .env
 *.local
+*.log
 
 # Stray IDE/tool files
 --db

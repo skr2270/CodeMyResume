@@ -1,0 +1,77 @@
+# Code My Resume (CMR) — Global Default Configuration
+# Override per-workspace by passing `--config path/to/config.yaml`.
+
+scanner:
+  ignore_dirs:
+    - node_modules
+    - .git
+    - .venv
+    - venv
+    - env
+    - .yarn
+    - build
+    - dist
+    - .gradle
+    - .next
+    - .nuxt
+    - .expo
+    - .turbo
+    - out
+    - coverage
+    - .nyc_output
+    - target
+    - vendor
+    - Pods
+    - .bundle
+    - .dart_tool
+    - __pycache__
+    - .pytest_cache
+    - .ruff_cache
+    - temp
+    - vault
+    - baseline
+    - appstore-screenshots
+    - .agents
+  # Evaluated case-insensitively against discovered *.md filenames
+  exclude_doc_files:
+    - SESSION_JOURNAL.md
+    - TODO.md
+    - to-do.md
+    - apple-review-reply.md
+    - apple-review-reply-5-1-1.md
+  max_file_size_bytes: 262144   # 250 KB cap per doc before Map-Reduce
+
+doc_budget:
+  full_file_max_chars: 8000
+  map_chunk_chars: 10000
+  chunk_token_estimate_chars: 3.5
+  tier1_digest_budget: 16000
+  tier2_digest_budget: 3000
+  tier2_keywords:
+    - changelog
+    - audit_summary
+    - audit-summary
+    - review
+    - walkthrough
+    - release_notes
+
+git:
+  min_user_commit_share_pct: 5.0
+
+llm:
+  provider: gemini              # gemini | ollama | openai | anthropic
+  synthesis_model: gemini-2.5-flash
+  map_model: gemini-2.5-flash-lite
+  temperature: 0.1
+  ollama_base_url: http://localhost:11434
+  max_retries: 2
+
+pdf:
+  page_size: A4                 # A4 | LETTER
+  target_pages: 2
+  min_page1_fill_ratio: 0.88
+  min_last_page_fill_ratio: 0.65
+  font_family: Inter            # Bundled TTF family with DejaVuSans/WinAnsi fallback
+
+# Optional user-supplied package -> (Canonical Name, Competency Domain) overrides
+taxonomy_overrides: {}

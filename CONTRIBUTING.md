@@ -1,6 +1,6 @@
 # Contributing to Code My Resume (CMR)
 
-Thank you for contributing to **Code My Resume (CMR)**! Whether you are adding a language manifest parser, expanding `TAXONOMY_RULES`, adding a PDF template, or strengthening ground-truth validation rules, please follow these engineering conventions.
+Thank you for contributing to **Code My Resume (CMR)**! Please review our [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md) and follow the engineering conventions below.
 
 ---
 
@@ -15,17 +15,22 @@ cd CodeMyResume
 python -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 
-# 3. Install in editable mode with dev dependencies
+# 3. Copy .env.example if running optional LLM integrations
+cp .env.example .env
+
+# 4. Install in editable mode with dev dependencies
 pip install -e ".[dev]"
 ```
+
+Repository formatting rules are defined in [`.editorconfig`](./.editorconfig) and [`.gitattributes`](./.gitattributes) (`LF` line endings for Python, Markdown, YAML, and TOML).
 
 ---
 
 ## 2. Before Submitting a Pull Request
 
-1. **Read the Design Specs First:** Check [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md), [`docs/PARSERS_SPEC.md`](./docs/PARSERS_SPEC.md), and [`docs/PROMPT_ENGINEERING.md`](./docs/PROMPT_ENGINEERING.md) so new modules align with `ProjectProfile`, `CareerContext`, and `ResumeAST`.
-2. **Keep Tests 100% Offline:** Unit tests in `tests/` must never require live internet calls or real LLM API keys—mock `LLMClient` responses and use `tmp_path` directory fixtures.
-3. **Never Bypass Secret Redaction:** Any new parser that feeds text to `engine/` must route extracted strings through `sanitizer.py` first.
+1. **Read the Design Specs First:** Check [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md), [`docs/PARSERS_SPEC.md`](./docs/PARSERS_SPEC.md), [`docs/EXPORTERS_SPEC.md`](./docs/EXPORTERS_SPEC.md), and [`docs/PROMPT_ENGINEERING.md`](./docs/PROMPT_ENGINEERING.md) so modules match `ProjectProfile`, `CareerContext`, and `ResumeAST`.
+2. **Keep Tests 100% Offline:** Unit tests in `tests/` must never require live internet calls or real LLM API keys—mock `LLMClient` responses and use `tmp_path` directory fixtures (`tests/conftest.py`).
+3. **Preserve Layer Boundaries & Redaction:** `cmr.parsers` must remain 100% offline/deterministic, and every parser output must pass through `sanitizer.py` before hitting `.cmr/` disk storage or `engine/` prompts.
 4. **Run Checks:**
    ```bash
    ruff check src tests
@@ -41,8 +46,8 @@ pip install -e ".[dev]"
 * Add unit test cases with sample manifest payloads in `tests/test_parsers.py`.
 
 ### Adding or Tuning Exporters
-* Every exporter (`src/cmr/exporters/`) must be a **pure, stateless renderer** accepting `ResumeAST` (`resume_ast.json`).
-* PDF exporter changes must preserve zero manual `PageBreak()` pagination and pass `pdfplumber` bounds/hyperlink assertions in `tests/test_exporters.py`.
+* Every exporter (`src/cmr/exporters/`) must remain a **pure, stateless renderer** accepting `ResumeAST` (`resume_ast.json`) as specified in [`docs/EXPORTERS_SPEC.md`](./docs/EXPORTERS_SPEC.md).
+* PDF exporter changes must bundle/load Unicode TTF fonts cleanly (`src/cmr/assets/fonts/`), compute header column widths dynamically, preserve zero manual `PageBreak()` pagination, and pass proportional `pdfplumber` fill assertions in `tests/test_exporters.py`.
 
 ---
 
@@ -54,3 +59,4 @@ CMR follows [Conventional Commits](https://www.conventionalcommits.org/):
 * `docs:` specification, PRD, or README updates
 * `test:` offline unit tests or golden fixtures
 * `refactor:` code cleanup without behavior changes
+* `ci:` GitHub Actions workflow or tooling config changes

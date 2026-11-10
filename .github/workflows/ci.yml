@@ -1,0 +1,70 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint-and-test:
+    name: ${{ matrix.os }} / Python ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        python-version: ["3.10", "3.12"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install metadata validation & test tooling
+        shell: bash
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f "src/cmr/__init__.py" ]; then
+            pip install -e ".[dev]"
+          else
+            pip install pyyaml tomli
+          fi
+
+      - name: Validate pyproject.toml & starter YAML configs
+        shell: bash
+        run: |
+          python - <<'EOF'
+          import yaml
+          try:
+              import tomllib
+          except ImportError:
+              import tomli as tomllib
+
+          with open("pyproject.toml", "rb") as fh:
+              data = tomllib.load(fh)
+          assert data["project"]["name"] == "code-my-resume"
+
+          for cfg in ("config.yaml", "career_context.example.yaml"):
+              with open(cfg, "r", encoding="utf-8") as fh:
+                  loaded = yaml.safe_load(fh)
+              assert isinstance(loaded, dict) and loaded
+
+          print("Verified pyproject.toml & starter YAML configs:", data["project"]["version"])
+          EOF
+
+      - name: Run Ruff & Pytest (when Phase 1 source exists)
+        shell: bash
+        run: |
+          if [ -f "src/cmr/__init__.py" ]; then
+            ruff check src tests
+            if [ -d "tests" ]; then
+              pytest -v
+            fi
+          else
+            echo "Spec baseline verified (Phase 1 implementation not started yet)."
+          fi

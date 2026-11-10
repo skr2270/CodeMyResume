@@ -1,0 +1,66 @@
+# Code My Resume (CMR) — Career Context Template (Synthetic Placeholder Example)
+# Generate a scan-bootstrapped copy with: cmr init-context --from-scan
+# Optional VS Code validation: run `cmr init-context` to emit `.cmr/career_context.schema.json`
+
+full_name: "Alex Rivera"
+headline: "Lead Full-Stack Architect & Founding Engineer"
+location: "Austin, TX"
+phone: "+1 555-019-2834"
+email: "alex@example.dev"
+linkedin_url: "https://www.linkedin.com/in/alex-rivera-dev"
+github_username: "alexriveradev"
+
+# Emails matched against `git shortlog` and child `.git` repos to filter forked codebases
+git_author_emails:
+  - "alex@example.dev"
+  - "alexriveradev@users.noreply.github.com"
+
+# Directories or confidential past employers that must never enter ResumeAST outputs
+excluded_directories:
+  - "legacy-archive-repo"
+  - "confidential-client-poc"
+
+# Explicit denylist blocking stale resume claims or disallowed framework extrapolations
+denied_claims:
+  - "Keycloak"
+  - "Kubernetes"
+
+ai_workflow_note: "Utilizes AI-augmented engineering workflows across architecture design, test automation, and release verification."
+
+employment_anchors:
+  - id: primary_platform
+    organization: "Nova Workforce Labs"
+    role_title: "Lead Full-Stack Architect"
+    location: "Remote / Hybrid"
+    start_date: "May 2024"
+    end_date: "Present"
+    engagement_type: "Full-Time"
+    mapped_project_dirs: ["nova-platform"]
+    anonymize_employer: false
+
+  - id: advisory_ventures
+    organization: "Independent Ventures & Client Engagements"
+    role_title: "Fractional CTO & Solutions Consultant"
+    location: "Austin, TX"
+    start_date: "May 2024"
+    end_date: "Present"
+    engagement_type: "Consulting"
+    mapped_project_dirs: ["commerce-app", "pdf-logistics", "workforce-suite", "cv-arcade"]
+    project_groups:
+      "Apex Retail Group": ["commerce-app", "pdf-logistics"]
+    non_code_impacts:
+      - "Configured Google Merchant Center profiles across 4 retail stores; trained store teams on digital operations"
+      - "Integrated POS, payment gateway, and shipping APIs while coordinating agency and paid-media deliverables"
+    anonymize_employer: false
+
+education:
+  - degree: "Master of Science (M.S.) in Computer Science"
+    institution: "Woolf / Partner Institute"
+    accreditation: "MFHEA / ECTS, Europe"
+    start_date: "2024"
+    end_date_or_expected: "Expected: 2026 / 2027"
+    specialization: "Distributed Systems, Cloud Architecture, Machine Learning, System Design"
+
+  - degree: "Bachelor of Technology (B.Tech) in Computer Science & Engineering"
+    institution: "State Engineering University"
+    end_date_or_expected: "Graduated: April 2022"

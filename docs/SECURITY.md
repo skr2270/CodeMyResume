@@ -6,29 +6,30 @@
 
 ## 1. Core Security & Privacy Principles
 
-1. **Local-First & Zero Telemetry:** CMR does not phone home, collect analytics, or upload repositories to third-party servers.
-2. **Strict Zero-Read File Blocklist:** Credential files, private keys, and runtime environment files are never opened or parsed:
-   * `.env`, `.env.*` *(only `.env.example` / `.env.template` key names are inspected for cloud service detection)*
+1. **Local-First & Zero Telemetry:** CMR does not phone home, collect telemetry, or upload repositories to third-party servers.
+2. **Offline-First `cmr scan`:** Default scanning (`cmr scan`) executes 100% locally with zero outbound network requests unless `--summarize` is explicitly enabled.
+3. **Strict Zero-Read File Blocklist:** Credential files, private keys, and runtime environment files are never opened or parsed:
+   * `.env`, `.env.*` *(only `.env.example` / `.env.template` key names are inspected for cloud service hints)*
    * `*.pem`, `*.key`, `*.p12`, `*.keystore`, `*.jks`
    * `google-services.json`, `GoogleService-Info.plist`, `*service-account*.json`
    * `id_rsa*`, `id_ed25519*`, `.npmrc`, `.pypirc`
-3. **Optional 100% Air-Gapped Mode (`Ollama` + `--offline`):** Users handling NDA-protected repositories can execute `cmr scan --offline` for deterministic parsing or route synthesis exclusively through a local Ollama daemon with zero outbound network traffic.
+4. **Optional 100% Air-Gapped Mode (`Ollama`):** Users handling NDA-protected repositories can synthesize `ResumeAST` exclusively through a local Ollama daemon (`OLLAMA_BASE_URL`) with zero external API traffic.
 
 ---
 
-## 2. Threat Boundary & Pre-LLM Redaction (`sanitizer.py`)
+## 2. Threat Boundary & Mandatory Pre-Persistence Redaction (`sanitizer.py`)
 
 ```text
-[Local Repositories] ──> [doc_parser / infra_detector] ──> [sanitizer.py (Redaction)] ──> [Cloud LLM / Cache]
-   • .env BLOCKED          • Reads *.md & configs          • Strips IPv4s, JWTs,         • Only sanitized
-   • *.key BLOCKED                                           API keys, DB URIs             digests leave disk
+[Local Repositories] ──> [doc_parser / infra_detector / topology_detector] ──> [sanitizer.py] ──> [.cmr/scan_report.json & .cmr/cache/ & Cloud LLM]
+   • .env BLOCKED          • Extracts *.md, infra & topology strings           • Strips server IPs,  • Only sanitized state ever leaves
+   • *.key BLOCKED                                                               JWTs, keys, URIs      parsers or hits disk cache
 ```
 
-Before any digest or prompt reaches a cloud LLM provider (`google-genai`, OpenAI, Anthropic) or `.cmr/cache/`, `sanitizer.py` enforces deterministic regex redaction:
+`sanitizer.py` inspects **all strings** emitted by `cmr.parsers` **before** persisting `.cmr/scan_report.json`, writing `.cmr/cache/`, or sending prompts to a cloud LLM (`google-genai`, OpenAI, Anthropic):
 
-| Sensitive Pattern | Detection Scope | Replacement Token |
+| Sensitive Pattern | Detection Scope & False-Positive Exclusions | Replacement Token |
 | :--- | :--- | :--- |
-| **Public IPv4 Addresses** | Non-RFC1918 server IPs inside deployment runbooks (`103.x.x.x`, `18.x.x.x`, excluding semantic version numbers) | `[REDACTED_IP]` |
+| **Public IPv4 Addresses** | Valid `0–255` dotted quads excluding RFC 1918 (`10.x`, `172.16–31.x`, `192.168.x`), `127.0.0.1`, `0.0.0.0`, and semantic/SDK version strings (`v1.2.3.4`, `16.0.10`, `10.0.22621.1`). Includes commented CORS IPs in server bootstrap configs if ever read by `infra_detector`. | `[REDACTED_IP]` |
 | **API Keys & Cloud Secrets** | Google (`AIza...`), OpenAI (`sk-...`), GitHub (`ghp_...`, `github_pat_...`), AWS (`AKIA...`), Slack (`xoxb-...`), high-entropy storefront tokens | `[REDACTED_TOKEN]` |
 | **JWTs & Bearer Headers** | `eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+` and `Authorization: Bearer ...` | `[REDACTED_JWT]` |
 | **Database Connection URIs** | `postgres(ql)?://[^:]+:[^@]+@`, `mongodb(\+srv)?://[^:]+:[^@]+@`, `redis(s)?://[^@]*@` | `[REDACTED_URI]` |
@@ -39,15 +40,16 @@ Before any digest or prompt reaches a cloud LLM provider (`google-genai`, OpenAI
 ## 3. Post-Synthesis Leak Verification (`validator.py`)
 
 Even after `sanitizer.py` cleans inputs, `validator.py` inspects the final `ResumeAST` (`resume_ast.json`) before any exporter runs:
-1. Fails (exit code `2`) if any `[REDACTED_*]` marker accidentally appears in generated resume copy.
-2. Fails if any IPv4 address, bearer token, or connection string pattern matches in `ResumeAST` bullets.
-3. Enforces `CareerContext.excluded_directories` and `anonymize_employer` rules so omitted/confidential employer names never appear in output files.
+1. Fails (Exit Code `2` in `--strict` mode) if any `[REDACTED_*]` marker accidentally appears in generated resume copy.
+2. Fails if any non-local IPv4 address, bearer token, or connection string pattern matches in `ResumeAST` fields.
+3. Enforces `CareerContext.excluded_directories`, `denied_claims`, and `anonymize_employer` rules so omitted names or legacy claims never appear in outputs.
 
 ---
 
-## 4. Local State & `.gitignore` Hygiene
+## 4. Public Docs & `.gitignore` Hygiene
 
-* Intermediate workspace artifacts (`.cmr/scan_report.json`, `.cmr/career_context.yaml`, `.cmr/resume_ast.json`, `.cmr/cache/`) and `.env` API keys are explicitly ignored in `.gitignore` so users never accidentally commit personal contact info, API keys, or private career context to public GitHub repos.
+* Intermediate workspace artifacts (`.cmr/`), `.env` API keys, generated PDFs/HTMLs, and personal `career_context.yaml` files are ignored in [`.gitignore`](../.gitignore) so users never accidentally commit phone numbers, API keys, or confidential employer histories to public repositories.
+* Starter templates (`career_context.example.yaml`, `docs/PRD.md`, `.env.example`) must always use synthetic placeholder data rather than real credentials or personal phone numbers.
 
 ---
 
