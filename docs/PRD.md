@@ -205,7 +205,6 @@ education:
   - degree: "Master of Science (M.S.) in Computer Science"
     institution: "Woolf / Partner Institute"
     accreditation: "MFHEA / ECTS, Europe"
-    start_date: "2024"
     end_date_or_expected: "Expected: 2026 / 2027"
     specialization: "Distributed Systems, Cloud Architecture, Machine Learning, System Design"
   - degree: "Bachelor of Technology (B.Tech) in Computer Science & Engineering"

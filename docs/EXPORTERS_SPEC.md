@@ -8,7 +8,7 @@ All exporters in `src/cmr/exporters/` **must be pure, stateless renderers**. The
 
 1. **Single Source of Truth:** `markdown_exporter.py`, `html_exporter.py`, `pdf_exporter.py`, `github_exporter.py`, and `linkedin_exporter.py` (inside `src/cmr/exporters/`) read exclusively from `ResumeAST`.
 2. **Pre-Sanitized Input Guarantee:** `validator.py` runs before any exporter executes, ensuring zero leaked IPs, API tokens, excluded directories, or `[REDACTED_*]` placeholders exist inside `ResumeAST`.
-3. **Neutral Academic Rendering:** Ongoing degrees render with `Expected` milestones (e.g., `2024 – Present (Expected: 2026 / 2027)`), while completed degrees emit concise graduation markers (`Graduated: April 2022`).
+3. **Neutral Academic Rendering (No Education "From" Dates):** All exporters omit education `start_date` ("from" dates) by default per ATS best practices—rendering only `Expected` completion dates for ongoing degrees (`Expected: 2026 / 2027`) and concise graduation dates for completed degrees (`Graduated: April 2022`).
 
 ---
 

@@ -12,7 +12,7 @@ Many AI resume tools fabricate metrics, extrapolate frameworks, or misrepresent 
 2. **Anti-Recency & Full-Scope Weighting:** Bullets backed by Tier 1A/1B docs and polyglot infra configs must capture end-to-end ownership (UI, mobile, API, database, security, deployment), preventing Tier 2 changelogs/audits from collapsing a multi-year Lead role into recent audits alone.
 3. **Strict Chronology & Employer Boundaries:** Projects mapped to `EmploymentAnchor A` (`May 2024 – Present`) never bleed into `EmploymentAnchor B` (`March 2021 – May 2024`). `excluded_directories` and `anonymize_employer` rules remove omitted names cleanly.
 4. **Non-Code Impact & FinOps Extraction:** Fractional CTO duties, POS/payment/logistics integrations, store staff training, ad-team alignment, AI-augmented engineering notes, and verified AWS/cloud FinOps optimizations are surfaced alongside code metrics.
-5. **Academic Formatting Rule:** Ongoing degrees render with `Expected` completion dates (`Expected: 2026 / 2027`); completed degrees emit concise graduation dates (`Graduated: April 2022`).
+5. **Academic Formatting Rule:** Omit education `start_date` ("from" dates) completely; ongoing degrees render with `Expected` completion dates (`Expected: 2026 / 2027`) and completed degrees emit concise graduation dates (`Graduated: April 2022`).
 6. **Allowlist + Legacy Denylist Guard:** Never carry forward legacy items declared in `CareerContext.denied_claims` (e.g., `Keycloak`, `Kubernetes`) unless actively verified on disk, and never extrapolate frameworks (e.g., `Next.js` or `WebGL` on a `Vite + Vanilla JS + HTML5 Canvas 2D` app).
 
 ---
